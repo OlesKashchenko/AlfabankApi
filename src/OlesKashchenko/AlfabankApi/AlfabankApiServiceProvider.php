@@ -1,4 +1,6 @@
-<?php namespace OlesKashchenko\AlfabankApi;
+<?php
+
+namespace OlesKashchenko\AlfabankApi;
 
 use Illuminate\Support\ServiceProvider;
 
@@ -19,6 +21,12 @@ class AlfabankApiServiceProvider extends ServiceProvider {
 	public function boot()
 	{
 		$this->package('oles-kashchenko/alfabank-api');
+
+		/*
+		include __DIR__.'/../../helpers.php';
+		//include __DIR__.'/../../filters.php';
+		include __DIR__.'/../../routes.php';
+		*/
 	}
 
 	/**
@@ -28,7 +36,9 @@ class AlfabankApiServiceProvider extends ServiceProvider {
 	 */
 	public function register()
 	{
-		//
+		$this->app['alfabankapi'] = $this->app->share(function($app) {
+			return new AlfabankApi();
+		});
 	}
 
 	/**
