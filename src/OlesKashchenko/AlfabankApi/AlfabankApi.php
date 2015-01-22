@@ -148,7 +148,7 @@ class AlfabankApi
 
     public function isOk()
     {
-        return isset($this->response['errorCode']) && !$this->response['errorCode'];
+        return !isset($this->response['errorCode']) || !$this->response['errorCode'];
     } // end isOk
 
     // FIXME:
@@ -248,7 +248,7 @@ class AlfabankApi
 
     private function doResponseDecode($encodedResponse)
     {
-        return json_decode($encodedResponse);
+        return json_decode($encodedResponse, true);
     } // end doResponseDecode
 }
 
