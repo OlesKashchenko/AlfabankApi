@@ -113,6 +113,15 @@ class AlfabankApi
         return $this->language;
     } // end getLanguage
 
+    public function getResponse()
+    {
+        if (!$this->response) {
+            throw new \RuntimeException('Alfabank: response is not set');
+        }
+
+        return $this->response;
+    } // end getResponse
+
     public function doSimpleOrderRegister(array $orderData)
     {
         $this->segmentUrl = 'register.do';
@@ -126,18 +135,57 @@ class AlfabankApi
 
     public function doSimpleOrderStatus($orderId)
     {
-        $this->segmentUrl = 'getOrderStatus';
+        $this->segmentUrl = 'getOrderStatus.do';
 
         $params = $this->getSimpleOrderStatusParams($orderId);
         $response = $this->doCurlRequest($params);
         $this->response = $this->doResponseDecode($response);
 
-        return $this->response;
+        return $this;
     } // end doSimpleOrderStatus
+
+    public function getOrderStatusAuthCode()
+    {
+        return $this->response['authCode'];
+    } // end getOrderStatusAuthCode
+
+    public function getOrderStatusAuthMessage()
+    {
+        switch ($this->response['authCode']) {
+            case '0':
+                return 'Платеж прошел успешно';
+            case '1':
+                return 'Неопределенная ошибка';
+            case '2':
+                return 'Отклонен эмитентом';
+            case '3':
+                return 'Не получен ответ от эмитента';
+            case '4':
+                return 'Ошибка на стороне эмитента';
+            case '5':
+                return 'Неправильно указана сумма платежа - недостаточно средств';
+            case '6':
+                return 'Срок действия карты истек';
+            case '7':
+                return 'По данной карте запрещены интернет транзакции';
+            case '8':
+                return 'Ошибка в формате данных';
+            case '10':
+                return 'Платеж превышает лимиты';
+            case '11':
+                return 'Прислано завершение на просроченный платеж';
+            case '12':
+                return 'Транзакция неправильно сформирована с точки зрения эмитента';
+            case '13':
+                return 'Транзакция неправильно сформирована с точки зрения эмитента';
+            default:
+                throw new \RuntimeException('Alfabank: not implemented authCode - '. $this->response['authCode']);
+        }
+    } // end getOrderStatusAuthCodeMessage
 
     public function doSimpleOrderStatusExt($orderId)
     {
-        $this->segmentUrl = 'getOrderStatusExtended';
+        $this->segmentUrl = 'getOrderStatusExtended.do';
 
         $params = $this->getSimpleOrderStatusExtParams($orderId);
         $response = $this->doCurlRequest($params);
@@ -151,35 +199,6 @@ class AlfabankApi
         return !isset($this->response['errorCode']) || !$this->response['errorCode'];
     } // end isOk
 
-    // FIXME:
-    public function getStatusMessage()
-    {
-        switch ($this->response['errorCode']) {
-            case '1':
-                return '';
-            case '2':
-                return '';
-            case '3':
-                return '';
-            case '4':
-                return '';
-            case '5':
-                return '';
-            case '6':
-                return '';
-            case '7':
-                return '';
-            case '8':
-                return '';
-            case '9':
-                return '';
-            case '10':
-                return '';
-            default:
-                throw new \RuntimeException('Alfabank: not implemented status code - '. $this->response['errorCode']);
-        }
-    } // end getStatusMessage
-
     private function getSimpleOrderRegisterParams($orderData)
     {
         $params = array(
@@ -188,8 +207,8 @@ class AlfabankApi
             'orderNumber'   => $orderData['id_order'],
             'amount'        => $orderData['amount'],
             'currency'      => $this->getCurrency(),
-            'returnUrl'     => urlencode($this->getSuccessUrl()),
-            'failUrl'       => urlencode($this->getFailUrl())
+            'returnUrl'     => $this->getSuccessUrl(),
+            'failUrl'       => $this->getFailUrl()
         );
 
         if (isset($orderData['description'])) {
