@@ -20,6 +20,7 @@ class AlfabankApi
     private $password;
     private $currency;
     private $language = 'ru';
+    private $rawResponse;
     private $response;
 
 
@@ -122,6 +123,15 @@ class AlfabankApi
         return $this->response;
     } // end getResponse
 
+    public function getRawResponse()
+    {
+        if (!$this->rawResponse) {
+            throw new \RuntimeException('Alfabank: raw response is not set');
+        }
+
+        return $this->rawResponse;
+    } // end getRawResponse
+
     public function doSimpleOrderRegister(array $orderData)
     {
         $this->segmentUrl = 'register.do';
@@ -138,8 +148,8 @@ class AlfabankApi
         $this->segmentUrl = 'getOrderStatus.do';
 
         $params = $this->getSimpleOrderStatusParams($orderId);
-        $response = $this->doCurlRequest($params);
-        $this->response = $this->doResponseDecode($response);
+        $this->rawResponse = $this->doCurlRequest($params);
+        $this->response = $this->doResponseDecode($this->rawResponse);
 
         return $this;
     } // end doSimpleOrderStatus
@@ -188,10 +198,10 @@ class AlfabankApi
         $this->segmentUrl = 'getOrderStatusExtended.do';
 
         $params = $this->getSimpleOrderStatusExtParams($orderId);
-        $response = $this->doCurlRequest($params);
-        $this->response = $this->doResponseDecode($response);
+        $this->rawResponse = $this->doCurlRequest($params);
+        $this->response = $this->doResponseDecode($this->rawResponse);
 
-        return $this->response;
+        return $this;
     } // end doSimpleOrderStatusExt
 
     public function isOk()
@@ -235,7 +245,7 @@ class AlfabankApi
         $params = array(
             'userName'      => $this->getUsername(),
             'password'      => $this->getPassword(),
-            'orderNumber'   => $orderId,
+            'orderId'       => $orderId,
             'language'      => $this->getLanguage()
         );
 
