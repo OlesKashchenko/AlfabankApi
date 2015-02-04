@@ -10,13 +10,7 @@
     "require": {
         "php": ">=5.3.0",
         "illuminate/support": "4.2.*",
-        "radic/blade-extensions": "1.1.*",
-        "baum/baum": "1.0.12",
-        "yandex/translate-api": "~1.0",
-        "mpratt/embera": "1.8.*",
-        "cartalyst/sentry": "2.1.*",
-        "barryvdh/laravel-elfinder": "0.1.x",
-        "intervention/image": "2.*"
+        "radic/blade-extensions": "1.1.*"
     },
     "autoload": {
         "classmap": [

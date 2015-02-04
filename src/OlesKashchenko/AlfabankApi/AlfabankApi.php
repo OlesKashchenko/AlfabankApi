@@ -12,14 +12,22 @@ class AlfabankApi
 {
     // system settings
     private $isTestMode = true;
+
+    // URL's
     private $serviceUrl = '';
     private $segmentUrl = '';
     private $failUrl;
     private $successUrl;
+
+    // shop credentials
     private $userName;
     private $password;
+
+    // location settings
     private $currency;
     private $language = 'ru';
+
+    // responses
     private $rawResponse;
     private $response;
 
@@ -132,6 +140,14 @@ class AlfabankApi
         return $this->rawResponse;
     } // end getRawResponse
 
+    public function getOrderStatusAuthCode()
+    {
+        return $this->response['authCode'];
+    } // end getOrderStatusAuthCode
+
+    /*
+     * One step order register
+     */
     public function doSimpleOrderRegister(array $orderData)
     {
         $this->segmentUrl = 'register.do';
@@ -143,6 +159,9 @@ class AlfabankApi
         return $this->response;
     } // end doSimpleOrderRegister
 
+    /*
+    * Get one step registered order status
+    */
     public function doSimpleOrderStatus($orderId)
     {
         $this->segmentUrl = 'getOrderStatus.do';
@@ -154,11 +173,9 @@ class AlfabankApi
         return $this;
     } // end doSimpleOrderStatus
 
-    public function getOrderStatusAuthCode()
-    {
-        return $this->response['authCode'];
-    } // end getOrderStatusAuthCode
-
+    /*
+     * Get auth message description
+     */
     public function getOrderStatusAuthMessage()
     {
         switch ($this->response['authCode']) {
@@ -193,6 +210,9 @@ class AlfabankApi
         }
     } // end getOrderStatusAuthCodeMessage
 
+    /*
+     * Get one step registered order status (extended)
+     */
     public function doSimpleOrderStatusExt($orderId)
     {
         $this->segmentUrl = 'getOrderStatusExtended.do';
@@ -204,11 +224,17 @@ class AlfabankApi
         return $this;
     } // end doSimpleOrderStatusExt
 
+    /*
+     * Check if order is registered successfully
+     */
     public function isOk()
     {
         return !isset($this->response['errorCode']) || !$this->response['errorCode'];
     } // end isOk
 
+    /*
+     * Form one step order register parameters
+     */
     private function getSimpleOrderRegisterParams($orderData)
     {
         $params = array(
@@ -228,6 +254,9 @@ class AlfabankApi
         return $params;
     } // end getSimpleRegisterOrderParams
 
+    /*
+     * Form Get one step registered order status parameters
+     */
     private function getSimpleOrderStatusParams($orderId)
     {
         $params = array(
@@ -240,6 +269,9 @@ class AlfabankApi
         return $params;
     } // end getSimpleOrderStatusParams
 
+    /*
+     * Form Get one step registered order status (extended) parameters
+     */
     private function getSimpleOrderStatusExtParams($orderId)
     {
         $params = array(
@@ -252,6 +284,9 @@ class AlfabankApi
         return $params;
     } // end getSimpleOrderStatusExtParams
 
+    /*
+     * Execute curl request
+     */
     private function doCurlRequest($data)
     {
         $ch = curl_init();
@@ -270,14 +305,19 @@ class AlfabankApi
         return $result;
     } // end doCurlRequest
 
+    /*
+     * Prepare params for request
+     */
     private function doPrepareRequestParams($params)
     {
         return http_build_query($params);
     } // end doPrepareRequestParams
 
+    /*
+     * Decode response
+     */
     private function doResponseDecode($encodedResponse)
     {
         return json_decode($encodedResponse, true);
     } // end doResponseDecode
 }
-
